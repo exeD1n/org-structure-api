@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: org_structure_db
+    environment:
+      POSTGRES_DB: org_structure
+      POSTGRES_USER: org_user
+      POSTGRES_PASSWORD: org_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U org_user -d org_structure"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: org_structure_api
+    environment:
+      DB_URL: postgresql+psycopg://org_user:org_password@db:5432/org_structure
+      LOG_LEVEL: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
