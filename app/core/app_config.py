@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 
 
 class AppConfig(BaseSettings):
-    db_url: str
+    db_url: str = "sqlite+pysqlite:///:memory:"
     log_level: str = "INFO"
 
 
